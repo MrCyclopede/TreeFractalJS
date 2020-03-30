@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Snake</title>
+    <style></style>
+</head>
+
+<body style="overflow:hidden; margin:0">
+
+    <canvas id="gameCanvas" style="border:10px;  solid #FFF555; " ></canvas>
+    <script>
+
+
+        // declare variables
+        const FPS = 60;
+        var canvas, context;
+
+        // load canvas
+        canvas = document.getElementById("gameCanvas");
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+        context = canvas.getContext("2d");
+
+
+
+
+        function get_color(n){
+          var gradient = ["#642B73", "#772F72", "#8B3471", "#9E3870", "#B23D6F", "#C6426E", "#AD3C6F", "#953670", "#7C3071", "#642B73"]
+          return (gradient[n % gradient.length])
+        }
+
+
+
+
+        function Point(x, y) {
+          this.x = x;
+          this.y = y;
+        }
+
+
+          function draw_line(a, b, color){
+            context.beginPath()
+            context.moveTo(a.y, a.x);
+            context.lineTo(b.y, b.x);
+            context.strokeStyle = color;
+            context.stroke();
+          }
+
+
+          var tree = {
+            'start_x': canvas.width / 2,
+            'start_y': canvas.height * 0.9,
+            'height':canvas.height * 0.8,
+            'angle': Math.PI / 16,
+            'depth': 5,
+            'ratio': 0.7
+          }
+
+
+          function draw_tree(x, y, h, ratio, depth, trunk_angle, angle){
+
+            let xend, yend;
+            let len;
+
+            len = h - h * ratio;
+            xend = x + len * Math.sin(trunk_angle);
+            yend = y + len * Math.cos(trunk_angle);
+
+
+
+            if (depth <= 0){return;}
+
+            draw_line(new Point(x, y), new Point(xend, yend), get_color(depth))
+
+
+
+            draw_tree(xend, yend, h * ratio, ratio, depth - 1, trunk_angle + angle, angle)
+            draw_tree(xend, yend, h * ratio, ratio, depth - 1, trunk_angle - angle, angle)
+          }
+
+          // set up interval (game loop)
+          setInterval(update, 1000 / FPS);
+          function update() {
+
+        //  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+          context.fillStyle = '#000000';
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          draw_tree(tree.start_y, tree.start_x, tree.height, tree.ratio, tree.depth, (3 * Math.PI) / 2, tree.angle);
+
+
+
+
+
+          }
+
+
+          document.addEventListener('click', function(event){
+
+
+
+
+
+
+          }, true);
+
+
+
+          document.addEventListener('mousemove', function(event){
+
+          let a = event.clientY / canvas.height;
+
+          console.log(a)
+          if (a > 1){ a = 1};
+
+
+
+          tree.angle = 2 * Math.PI * a;
+
+
+
+
+
+
+          }, true);
+
+
+          document.addEventListener('keydown', function(event){
+            if (event.keyCode == 37 && tree.ratio < 1) {
+                tree.ratio += 0.01
+
+            }
+            else if (event.keyCode == 39) {
+                      tree.ratio -= 0.01
+
+            }
+            else if (event.keyCode == 38) {
+                  tree.depth++;
+            }
+            else if (event.keyCode == 40 && tree.depth > 1) {
+                tree.depth--;
+            }
+
+          }, true);
+
+
+
+    </script>
+</body>
+
+</html>
